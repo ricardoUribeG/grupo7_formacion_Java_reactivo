@@ -2,7 +2,6 @@ package com.example.despacho.controller;
 
 import com.example.despacho.dto.CrearOrdenRequest;
 import com.example.despacho.dto.EventoOrden;
-import com.example.despacho.model.OrdenCompra;
 import com.example.despacho.service.OrdenCompraService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

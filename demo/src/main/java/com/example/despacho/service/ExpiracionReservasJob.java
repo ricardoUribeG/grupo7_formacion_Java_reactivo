@@ -2,7 +2,6 @@ package com.example.despacho.service;
 
 import com.example.despacho.common.AppProperties;
 import com.example.despacho.dto.EventoOrden;
-import com.example.despacho.model.EstadoOrden;
 import com.example.despacho.repository.ItemOrdenRepository;
 import com.example.despacho.repository.OrdenCompraRepository;
 import jakarta.annotation.PreDestroy;

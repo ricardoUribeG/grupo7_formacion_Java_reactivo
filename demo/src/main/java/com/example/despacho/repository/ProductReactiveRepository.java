@@ -1,6 +1,5 @@
 package com.example.despacho.repository;
 
-import com.example.despacho.model.Producto;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;

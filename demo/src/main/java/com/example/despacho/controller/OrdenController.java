@@ -1,6 +1,5 @@
 package com.example.despacho.controller;
 
-import com.example.despacho.model.Orden;
 import com.example.despacho.service.OrdenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

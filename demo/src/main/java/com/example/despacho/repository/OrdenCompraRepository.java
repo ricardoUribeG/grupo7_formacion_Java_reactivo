@@ -1,7 +1,5 @@
 package com.example.despacho.repository;
 
-import com.example.despacho.model.EstadoOrden;
-import com.example.despacho.model.OrdenCompra;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

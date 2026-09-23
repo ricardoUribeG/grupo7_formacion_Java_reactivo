@@ -1,5 +1,4 @@
 package com.example.despacho.repository;
-import com.example.despacho.model.Cliente;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 

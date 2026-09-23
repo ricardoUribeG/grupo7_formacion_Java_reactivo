@@ -1,7 +1,6 @@
 package com.example.despacho.service;
 
 import com.example.despacho.dto.EventoOrden;
-import com.example.despacho.model.EventoInventario;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;

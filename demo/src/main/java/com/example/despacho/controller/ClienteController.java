@@ -1,6 +1,5 @@
 package com.example.despacho.controller;
 
-import com.example.despacho.model.Cliente;
 import com.example.despacho.service.ClienteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

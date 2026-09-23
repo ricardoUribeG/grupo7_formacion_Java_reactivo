@@ -1,7 +1,5 @@
 package com.example.despacho.dto;
 
-import com.example.despacho.model.EstadoOrden;
-
 import java.time.Instant;
 
 public record EventoOrden(Long ordenId, EstadoOrden estado, String mensaje, Instant timestamp) {

@@ -1,6 +1,5 @@
 package com.example.despacho.service;
 
-import com.example.despacho.model.Cliente;
 import com.example.despacho.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

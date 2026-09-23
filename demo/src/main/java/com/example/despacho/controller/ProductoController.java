@@ -1,7 +1,6 @@
 package com.example.despacho.controller;
 
 
-import com.example.despacho.model.Producto;
 import com.example.despacho.repository.ProductReactiveRepository;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
