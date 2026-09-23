@@ -1,7 +1,5 @@
 package com.example.despacho;
 
-import com.example.despacho.controller.ClienteController;
-import com.example.despacho.service.ClienteService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
