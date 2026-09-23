@@ -1,60 +1,42 @@
-CREATE TABLE IF NOT EXISTS clientes (
-    id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS ordenes (
-    id SERIAL PRIMARY KEY,
-    descripcion VARCHAR(255) NOT NULL,
-    cliente_id INTEGER NOT NULL,
-    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
-);
-
-CREATE TABLE IF NOT EXISTS productos (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    stock INTEGER NOT NULL,
-    price DECIMAL(10, 2) NOT NULL
-);
-
--- nuevas columnas del caso de uso
-ALTER TABLE productos ADD COLUMN IF NOT EXISTS category VARCHAR(64);
-ALTER TABLE productos ADD COLUMN IF NOT EXISTS reserved INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE productos ADD CONSTRAINT productos_stock_no_negativo CHECK (stock >= 0) NOT VALID;
-
-CREATE TABLE IF NOT EXISTS orden_compra (
+CREATE TABLE IF NOT EXISTS vehiculo (
     id BIGSERIAL PRIMARY KEY,
-    cliente_id BIGINT,
-    region VARCHAR(16),
+    placa VARCHAR(16) NOT NULL UNIQUE,
+    ciudad VARCHAR(64) NOT NULL,
+    cupo_kg INTEGER NOT NULL,
+    cupo_kg_original INTEGER NOT NULL,
+    actualizado_en TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+ALTER TABLE vehiculo ADD CONSTRAINT vehiculo_cupo_no_negativo CHECK (cupo_kg >= 0) NOT VALID;
+
+CREATE TABLE IF NOT EXISTS despacho (
+    id BIGSERIAL PRIMARY KEY,
+    cliente_id BIGINT NOT NULL,
+    ciudad VARCHAR(64) NOT NULL,
     idempotency_key VARCHAR(128),
     estado VARCHAR(20) NOT NULL,
-    subtotal DECIMAL(12, 2),
-    impuesto DECIMAL(12, 2),
-    total DECIMAL(12, 2),
-    risk_score INTEGER,
+    tarifa DECIMAL(12, 2),
+    minutos_entrega INTEGER,
+    score_riesgo INTEGER,
+    total_kg DECIMAL(12, 2),
     creado_en TIMESTAMPTZ NOT NULL DEFAULT now(),
-    expira_en TIMESTAMPTZ
-);
-CREATE UNIQUE INDEX IF NOT EXISTS ux_orden_compra_idem ON orden_compra (idempotency_key)
+    expira_en TIMESTAMPTZ,
+    traza_id VARCHAR(64)
+    );
+CREATE UNIQUE INDEX IF NOT EXISTS ux_despacho_idem ON despacho (idempotency_key)
     WHERE idempotency_key IS NOT NULL;
-CREATE INDEX IF NOT EXISTS ix_orden_compra_estado_expira ON orden_compra (estado, expira_en);
+CREATE INDEX IF NOT EXISTS ix_despacho_estado_expira ON despacho (estado, expira_en);
 
-CREATE TABLE IF NOT EXISTS orden_item (
+CREATE TABLE IF NOT EXISTS paquete (
     id BIGSERIAL PRIMARY KEY,
-    orden_id BIGINT NOT NULL REFERENCES orden_compra(id) ON DELETE CASCADE,
-    producto_id BIGINT NOT NULL,
-    categoria VARCHAR(64),
-    cantidad INTEGER NOT NULL,
-    precio_unitario DECIMAL(12, 2)
-);
-CREATE INDEX IF NOT EXISTS ix_orden_item_orden ON orden_item (orden_id);
+    despacho_id BIGINT NOT NULL REFERENCES despacho(id) ON DELETE CASCADE,
+    vehiculo_id BIGINT NOT NULL,
+    peso_kg DECIMAL(10, 2) NOT NULL
+    );
+CREATE INDEX IF NOT EXISTS ix_paquete_despacho ON paquete (despacho_id);
 
-CREATE TABLE IF NOT EXISTS evento_inventario (
-    id BIGSERIAL PRIMARY KEY,
-    tipo VARCHAR(20) NOT NULL,
-    producto_id BIGINT NOT NULL,
-    delta INTEGER NOT NULL,
-    orden_id BIGINT,
-    ocurrido_en TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+-- Datos semilla mínimos para poder probar la demo sin cargar el bulk primero
+INSERT INTO vehiculo (placa, ciudad, cupo_kg, cupo_kg_original)
+VALUES ('ABC123', 'BOG', 500, 500),
+       ('XYZ987', 'MDE', 300, 300),
+       ('QWE111', 'BOG', 800, 800)
+    ON CONFLICT (placa) DO NOTHING;
