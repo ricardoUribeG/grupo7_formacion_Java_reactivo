@@ -2,11 +2,10 @@ CREATE TABLE IF NOT EXISTS vehiculo (
     id BIGSERIAL PRIMARY KEY,
     placa VARCHAR(16) NOT NULL UNIQUE,
     ciudad VARCHAR(64) NOT NULL,
-    cupo_kg INTEGER NOT NULL,
+    cupo_kg INTEGER NOT NULL CHECK (cupo_kg >= 0),
     cupo_kg_original INTEGER NOT NULL,
     actualizado_en TIMESTAMPTZ NOT NULL DEFAULT now()
     );
-ALTER TABLE vehiculo ADD CONSTRAINT vehiculo_cupo_no_negativo CHECK (cupo_kg >= 0) NOT VALID;
 
 CREATE TABLE IF NOT EXISTS despacho (
     id BIGSERIAL PRIMARY KEY,
