@@ -7,41 +7,43 @@ import com.example.despacho.repository.VehiculoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.test.StepVerifier;
 
-import java.time.Duration;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Prueba E2E completa: reserva de cupo -> cotización paralela contra
- * /external/** -> persistencia transaccional -> confirm -> SSE.
- *
- * Requiere Postgres arriba (docker compose up -d) porque ejercita R2DBC real,
- * tal como exige la lista de verificación del taller.
- */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient(timeout = "30000")
 class DespachoFlowE2ETest {
 
-    @Autowired
-    private WebTestClient client;
-
-    @Autowired
-    private VehiculoRepository vehiculoRepository;
+    // 1. Declaramos las dependencias como final (Inmutabilidad)
+    private final WebTestClient client;
+    private final VehiculoRepository vehiculoRepository;
 
     private Long vehiculoId;
+
+    // 2. JUnit 5 y Spring inyectan automáticamente los parámetros del constructor
+    DespachoFlowE2ETest(WebTestClient client, VehiculoRepository vehiculoRepository) {
+        this.client = client;
+        this.vehiculoRepository = vehiculoRepository;
+    }
 
     @BeforeEach
     void sembrarVehiculo() {
         Vehiculo v = new Vehiculo(null, "E2E-" + System.nanoTime(), "BOG", 500, 500);
-        vehiculoId = vehiculoRepository.save(v).map(Vehiculo::getId).block(Duration.ofSeconds(10));
 
-        // simulador sin fallas forzadas, para que el happy path sea determinista
+        // Uso de StepVerifier para extraer el ID reactivamente sin bloquear (.block())
+        vehiculoRepository.save(v)
+                .map(Vehiculo::getId)
+                .as(StepVerifier::create)
+                .consumeNextWith(id -> this.vehiculoId = id)
+                .verifyComplete();
+
+        // Simulador sin fallas forzadas
         client.delete().uri("/external/simulator").exchange().expectStatus().isOk();
     }
 
@@ -71,9 +73,14 @@ class DespachoFlowE2ETest {
                 .expectBody()
                 .jsonPath("$.estado").isEqualTo("EN_RUTA");
 
-        Vehiculo actualizado = vehiculoRepository.findById(vehiculoId).block(Duration.ofSeconds(10));
-        assertThat(actualizado).isNotNull();
-        assertThat(actualizado.getCupoKg()).isEqualTo(500 - 120);
+        // Verificación reactiva del repositorio usando StepVerifier
+        vehiculoRepository.findById(vehiculoId)
+                .as(StepVerifier::create)
+                .assertNext(actualizado -> {
+                    assertThat(actualizado).isNotNull();
+                    assertThat(actualizado.getCupoKg()).isEqualTo(500 - 120);
+                })
+                .verifyComplete();
     }
 
     @Test

@@ -43,11 +43,11 @@ public class ReporteService {
         Flux<Despacho> vivos = bus.despachosAsignados();
 
         return Flux.concat(historicos, vivos)
-                .scan(new LinkedHashMap<String, ReporteCiudad>(), (mapa, d) -> {
+                .<LinkedHashMap<String, ReporteCiudad>> scan(new LinkedHashMap<String, ReporteCiudad>(), (mapa, d) -> {
                     Map<String, ReporteCiudad> copia = new LinkedHashMap<>(mapa);
                     ReporteCiudad actual = copia.getOrDefault(d.getCiudad(), ReporteCiudad.vacio(d.getCiudad()));
                     copia.put(d.getCiudad(), actual.mas(d.getTotalKg(), d.getTarifa() == null ? 0 : d.getTarifa()));
-                    return copia;
+                    return (LinkedHashMap<String, ReporteCiudad>) copia;
                 })
                 .skip(1)
                 .concatMap(mapa -> Flux.fromIterable(mapa.values()));
