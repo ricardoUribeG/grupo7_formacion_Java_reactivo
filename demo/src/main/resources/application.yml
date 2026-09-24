@@ -2,7 +2,7 @@ spring:
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/testdb
     username: postgres
-    password: admin
+    password: postgres
   sql:
     init:
       mode: always
