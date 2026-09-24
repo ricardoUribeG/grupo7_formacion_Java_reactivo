@@ -196,7 +196,9 @@ public class DespachoService {
             Flux<EventoDespacho> heartbeat = Flux.interval(Duration.ofSeconds(15))
                     .map(t -> EventoDespacho.heartbeat(id, d.getTrazaId()));
             Mono<EventoDespacho> actual = Mono.just(EventoDespacho.de(d.getId(), d.getEstado(), "estado actual", d.getTrazaId()));
-            Flux<EventoDespacho> vivo = bus.eventosDespacho().filter(e -> id.equals(e.despachoId()));
+            Flux<EventoDespacho> vivo = bus.eventosDespacho()
+                    .filter(e -> id.equals(e.despachoId()))
+                    .distinctUntilChanged(EventoDespacho::estado);
             return Flux.merge(actual, vivo, heartbeat)
                     .takeUntil(e -> e.estado() != null && e.estado().esTerminado())
                     .doOnCancel(() -> log.info("Cliente cerró stream del despacho {}", id))

@@ -13,6 +13,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.TestPublisher;
 
+import java.time.Duration;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,6 +52,8 @@ class DespachoServiceStreamTest {
                         && evento.estado() == EstadoDespacho.ASIGNADO)
                 .then(() -> eventos.next(eventoVivo))
                 .expectNext(eventoVivo)
+                .then(() -> eventos.next(eventoVivo))
+                .expectNoEvent(Duration.ofMillis(50))
                 .thenCancel()
                 .verify();
 

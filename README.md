@@ -127,9 +127,10 @@ archivos para evitar problemas con comillas y saltos de línea.
 | `onBackpressureLatest` | `TableroService.java:30` | Conserva el evento más reciente para clientes lentos |
 | `limitRate` | `ReporteService.java:29` | Controla la demanda del reporte por ciudad |
 | `onBackpressureDrop` | `ExpiracionJob.java:49` | Descarta ticks si el job anterior sigue activo |
-| `Flux.merge` | `DespachoService.java:200` | Fusiona estado actual, eventos y heartbeat |
-| `takeUntil` | `DespachoService.java:201` | Cierra el SSE al alcanzar un estado terminal |
-| `doOnCancel` y `doFinally` | `DespachoService.java:202-203` | Gestiona y registra el cierre del stream SSE |
+| `distinctUntilChanged` | `DespachoService.java:201` | Evita publicar dos veces consecutivas el mismo estado |
+| `Flux.merge` | `DespachoService.java:202` | Fusiona estado actual, eventos y heartbeat |
+| `takeUntil` | `DespachoService.java:203` | Cierra el SSE al alcanzar un estado terminal |
+| `doOnCancel` y `doFinally` | `DespachoService.java:204-205` | Gestiona y registra el cierre del stream SSE |
 | `contextWrite` | `TrazaWebFilter.java:33` | Propaga el `trazaId` mediante Reactor Context |
 | `DatabaseClient` y `RETURNING` | `CupoService.java:33-41` | Descuenta cupo mediante una actualización atómica |
 | `TransactionalOperator` | `DespachoService.java:146` | Delimita la transacción reactiva de persistencia |
