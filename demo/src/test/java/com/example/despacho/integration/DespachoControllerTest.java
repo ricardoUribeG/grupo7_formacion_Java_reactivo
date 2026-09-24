@@ -107,7 +107,7 @@ class DespachoControllerTest {
         client.post().uri("/api/despachos")
                 .bodyValue(body)
                 .exchange()
-                .expectStatus().isEqualTo(422)
+                .expectStatus().value(status -> org.assertj.core.api.Assertions.assertThat(status).isEqualTo(422))
                 .expectBody()
                 .jsonPath("$.codigo").isEqualTo("ZONA_RIESGOSA");
     }

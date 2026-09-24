@@ -7,6 +7,7 @@ import com.example.despacho.repository.VehiculoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -27,6 +28,7 @@ class DespachoFlowE2ETest {
     private Long vehiculoId;
 
     // 2. JUnit 5 y Spring inyectan automáticamente los parámetros del constructor
+    @Autowired
     DespachoFlowE2ETest(WebTestClient client, VehiculoRepository vehiculoRepository) {
         this.client = client;
         this.vehiculoRepository = vehiculoRepository;
