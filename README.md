@@ -129,6 +129,7 @@ archivos para evitar problemas con comillas y saltos de línea.
 | `onBackpressureDrop` | `ExpiracionJob.java:49` | Descarta ticks si el job anterior sigue activo |
 | `Flux.merge` | `DespachoService.java:200` | Fusiona estado actual, eventos y heartbeat |
 | `takeUntil` | `DespachoService.java:201` | Cierra el SSE al alcanzar un estado terminal |
+| `doOnCancel` y `doFinally` | `DespachoService.java:202-203` | Gestiona y registra el cierre del stream SSE |
 | `contextWrite` | `TrazaWebFilter.java:33` | Propaga el `trazaId` mediante Reactor Context |
 | `DatabaseClient` y `RETURNING` | `CupoService.java:33-41` | Descuenta cupo mediante una actualización atómica |
 | `TransactionalOperator` | `DespachoService.java:146` | Delimita la transacción reactiva de persistencia |

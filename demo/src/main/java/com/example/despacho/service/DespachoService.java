@@ -199,7 +199,8 @@ public class DespachoService {
             Flux<EventoDespacho> vivo = bus.eventosDespacho().filter(e -> id.equals(e.despachoId()));
             return Flux.merge(actual, vivo, heartbeat)
                     .takeUntil(e -> e.estado() != null && e.estado().esTerminado())
-                    .doOnCancel(() -> log.info("Cliente cerró stream del despacho {}", id));
+                    .doOnCancel(() -> log.info("Cliente cerró stream del despacho {}", id))
+                    .doFinally(signal -> log.info("Stream del despacho {} finalizó con {}", id, signal));
         });
     }
 
