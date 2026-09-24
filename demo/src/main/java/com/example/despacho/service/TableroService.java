@@ -22,12 +22,11 @@ public class TableroService {
 
     public TableroService(EventBus bus) {
         this.compartido = bus.eventosTablero()
-                .onBackpressureLatest()
                 .publish()
                 .refCount(1);
     }
 
     public Flux<EventoTablero> tablero() {
-        return compartido;
+        return compartido.onBackpressureLatest();
     }
 }

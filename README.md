@@ -123,8 +123,8 @@ archivos para evitar problemas con comillas y saltos de línea.
 | `timeout` | `TransportistaClient.java:89` | Limita la espera del servicio de riesgo |
 | `cache(Duration)` | `TransportistaClient.java:81` | Comparte por diez minutos la ventana de clima |
 | `Sinks.many` | `EventBus.java:26-28` | Mantiene los buses internos de eventos |
-| `publish().refCount(1)` | `TableroService.java:26-27` | Comparte un único stream caliente del tablero |
-| `onBackpressureLatest` | `TableroService.java:25` | Conserva el evento más reciente para clientes lentos |
+| `publish().refCount(1)` | `TableroService.java:25-26` | Comparte un único stream caliente del tablero |
+| `onBackpressureLatest` | `TableroService.java:30` | Conserva el evento más reciente para clientes lentos |
 | `limitRate` | `ReporteService.java:29` | Controla la demanda del reporte por ciudad |
 | `onBackpressureDrop` | `ExpiracionJob.java:49` | Descarta ticks si el job anterior sigue activo |
 | `Flux.merge` | `DespachoService.java:200` | Fusiona estado actual, eventos y heartbeat |
