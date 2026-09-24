@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.publisher.TestPublisher;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -100,21 +101,20 @@ class TransportistaClientTest {
 
         TransportistaClient transportista = new TransportistaClient(client, PROPS);
 
-        StepVerifier.create(transportista.riesgoZona("BOG"))
+        StepVerifier.withVirtualTime(() -> transportista.riesgoZona("BOG"))
+                .thenAwait(PROPS.external().riesgoTimeout())
                 .assertNext(score -> assertThat(score).isEqualTo(PROPS.defaultRiskScore()))
                 .verifyComplete();
     }
 
     @Test
-    void clima_seCacheaParaLaMismaCiudad_soloUnaLlamadaAlExterno() {
+    void clima_conFuenteControlada_seCacheaParaLaMismaCiudad() {
         AtomicInteger llamadas = new AtomicInteger();
+        TestPublisher<ClientResponse> respuestas = TestPublisher.createCold();
         WebClient client = WebClient.builder()
                 .exchangeFunction(req -> {
                     llamadas.incrementAndGet();
-                    return Mono.just(ClientResponse.create(HttpStatus.OK)
-                            .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                            .body("{\"ciudad\":\"BOG\",\"minutosEntrega\":25}")
-                            .build());
+                    return respuestas.mono();
                 })
                 .build();
 
@@ -123,7 +123,13 @@ class TransportistaClientTest {
         Mono<VentanaClima> primera = transportista.clima("BOG");
         Mono<VentanaClima> segunda = transportista.clima("BOG");
 
-        StepVerifier.create(primera).expectNextCount(1).verifyComplete();
+        StepVerifier.create(primera)
+                .then(() -> respuestas.emit(ClientResponse.create(HttpStatus.OK)
+                        .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                        .body("{\"ciudad\":\"BOG\",\"minutosEntrega\":25}")
+                        .build()))
+                .assertNext(ventana -> assertThat(ventana.minutosEntrega()).isEqualTo(25))
+                .verifyComplete();
         StepVerifier.create(segunda).expectNextCount(1).verifyComplete();
 
         assertThat(llamadas.get()).isEqualTo(1);
